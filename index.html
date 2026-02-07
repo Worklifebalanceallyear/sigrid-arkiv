@@ -1,0 +1,36 @@
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .episode-card:active { transform: scale(0.98); transition: 0.1s; }
+    </style>
+</head>
+<body class="bg-black text-gray-100 font-sans">
+    <nav class="sticky top-0 bg-gray-900 p-4 border-b border-gray-800 z-10">
+        <h1 class="text-xl font-bold text-blue-400">Sigrid Riise Arkiv</h1>
+        <input type="text" id="search" placeholder="Søg i afsnit..." class="w-full mt-2 p-2 bg-gray-800 rounded border-none">
+    </nav>
+
+    <div id="app" class="p-4 space-y-4">
+        </div>
+
+    <script>
+        async function loadApp() {
+            const res = await fetch('data.json');
+            const data = await res.json();
+            const container = document.getElementById('app');
+
+            data.forEach(ep => {
+                container.innerHTML += `
+                    <div class="episode-card bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-lg">
+                        <span class="text-xs text-blue-500 font-mono">${new Date(ep.timestamp).toLocaleDateString('da-DK')}</span>
+                        <h2 class="text-lg font-semibold mt-1">${ep.title}</h2>
+                        <p class="text-sm text-gray-400 mt-2 line-clamp-2">${ep.description}</p>
+                        <a href="${ep.link}" target="_blank" class="block mt-4 text-center bg-blue-600 py-3 rounded-lg font-bold">START STREAMING</a>
+                    </div>
+                `;
+            });
+        }
+        loadApp();
+    </script>
+</body>
