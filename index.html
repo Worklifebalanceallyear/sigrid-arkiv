@@ -1,36 +1,63 @@
+<!DOCTYPE html>
+<html lang="da">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Sigrid Riise Arkiv</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .episode-card:active { transform: scale(0.98); transition: 0.1s; }
+        body { background-color: #000; -webkit-tap-highlight-color: transparent; }
+        .episode-card { transition: transform 0.1s ease; }
+        .episode-card:active { transform: scale(0.97); background-color: #1a1a1a; }
+        /* Skjul scrollbar men bevar funktionalitet */
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-black text-gray-100 font-sans">
-    <nav class="sticky top-0 bg-gray-900 p-4 border-b border-gray-800 z-10">
-        <h1 class="text-xl font-bold text-blue-400">Sigrid Riise Arkiv</h1>
-        <input type="text" id="search" placeholder="Søg i afsnit..." class="w-full mt-2 p-2 bg-gray-800 rounded border-none">
+<body class="text-gray-100 font-sans antialiased">
+
+    <nav class="sticky top-0 bg-gray-900/95 backdrop-blur-md p-4 border-b border-gray-800 z-50">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-xl font-black tracking-tight text-blue-500">SIGRID RIISE <span class="text-white font-light text-sm ml-2">ARKIV</span></h1>
+        </div>
+        <input type="text" id="search" onkeyup="filterEpisodes()" placeholder="Søg i titler eller emner..." 
+               class="w-full p-3 bg-gray-800 rounded-lg border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600">
     </nav>
 
-    <div id="app" class="p-4 space-y-4">
-        </div>
+    <main id="app" class="p-4 space-y-4 pb-20">
+        <div class="text-center py-10 text-gray-500 italic">Indlæser afsnit...</div>
+    </main>
 
     <script>
-        async function loadApp() {
-            const res = await fetch('data.json');
-            const data = await res.json();
-            const container = document.getElementById('app');
+        let allEpisodes = [];
 
-            data.forEach(ep => {
-                container.innerHTML += `
-                    <div class="episode-card bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-lg">
-                        <span class="text-xs text-blue-500 font-mono">${new Date(ep.timestamp).toLocaleDateString('da-DK')}</span>
-                        <h2 class="text-lg font-semibold mt-1">${ep.title}</h2>
-                        <p class="text-sm text-gray-400 mt-2 line-clamp-2">${ep.description}</p>
-                        <a href="${ep.link}" target="_blank" class="block mt-4 text-center bg-blue-600 py-3 rounded-lg font-bold">START STREAMING</a>
-                    </div>
-                `;
-            });
+        async function loadApp() {
+            try {
+                // Mekanisme: Cache-busting vha. tidsstempel sikrer frisk data
+                const res = await fetch('data.json?v=' + new Date().getTime());
+                allEpisodes = await res.json();
+                renderEpisodes(allEpisodes);
+            } catch (error) {
+                document.getElementById('app').innerHTML = `
+                    <div class="p-6 bg-red-900/20 text-red-400 rounded-lg border border-red-800">
+                        <strong>Fejl:</strong> Kunne ikke hente data. Tjek at data.json er gyldig.
+                    </div>`;
+            }
         }
-        loadApp();
-    </script>
-</body>
+
+        function renderEpisodes(episodes) {
+            const container = document.getElementById('app');
+            container.innerHTML = ''; 
+
+            if (episodes.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500">Ingen afsnit fundet.</p>';
+                return;
+            }
+
+            episodes.forEach(ep => {
+                // Robust link-mekanisme: Vi bruger søge-parametret for at tvinge arkivet til at validere ID'et
+                const secureLink = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=${ep.id}`;
+                
+                const div = document.createElement('div');
+                div.className = "episode-card bg-gray-
