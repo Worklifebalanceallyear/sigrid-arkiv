@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Sigrid Riise Arkiv</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #000; -webkit-tap-highlight-color: transparent; }
-        .episode-card:active { transform: scale(0.98); background-color: #111; }
-        .sticky-header { background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(10px); }
+        .episode-card:active { transform: scale(0.99); background-color: #111; }
+        .sticky-header { background: rgba(17, 24, 39, 0.98); backdrop-filter: blur(15px); }
+        .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
 <body class="text-gray-100 font-sans">
 
     <nav class="sticky-header sticky top-0 p-4 border-b border-gray-800 z-50 shadow-2xl">
         <div class="flex justify-between items-center mb-4">
-            <h1 class="text-xl font-bold text-blue-500 uppercase tracking-tighter italic">Sigrid Riise <span class="text-white not-italic font-light text-sm">Arkiv</span></h1>
-            <span id="count" class="text-[10px] bg-gray-800 px-2 py-1 rounded text-gray-400 font-mono">0 afsnit</span>
+            <h1 class="text-xl font-bold text-blue-500 uppercase tracking-tighter italic">Sigrid Riise <span class="text-white not-italic font-light text-sm">Streaming</span></h1>
+            <span id="count" class="text-[10px] bg-blue-900/30 px-2 py-1 rounded text-blue-400 font-mono font-bold">0 afsnit</span>
         </div>
-        <input type="text" id="search" onkeyup="filterEpisodes()" placeholder="Søg år (f.eks. 1995) eller emne..." 
-               class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-600 outline-none transition-all">
+        <input type="text" id="search" onkeyup="filterEpisodes()" placeholder="Søg i emner (f.eks. søvn, jalousi, 1994)..." 
+               class="w-full p-4 bg-gray-800 rounded-2xl border border-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-600 outline-none transition-all shadow-inner text-base">
     </nav>
 
-    <main id="app" class="p-4 space-y-4 pb-20">
-        <div class="text-center py-20 text-gray-500 animate-pulse">Indlæser database...</div>
+    <main id="app" class="p-4 space-y-5 pb-24">
+        <div class="text-center py-20 text-gray-500 animate-pulse">Indlæser det fulde arkiv...</div>
     </main>
 
     <script>
@@ -41,7 +41,7 @@
                 document.getElementById('count').innerText = `${allEpisodes.length} afsnit`;
                 renderEpisodes(allEpisodes);
             } catch (error) {
-                document.getElementById('app').innerHTML = `<div class="p-10 text-red-500 text-center text-sm">Kunne ikke indlæse data.json.</div>`;
+                document.getElementById('app').innerHTML = `<div class="p-10 text-red-500 text-center text-sm font-bold uppercase tracking-widest">Fejl: Tjek data.json struktur</div>`;
             }
         }
 
@@ -51,17 +51,21 @@
 
             episodes.forEach(ep => {
                 const div = document.createElement('div');
-                div.className = "bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl transition-all";
+                div.className = "bg-gray-900 border border-gray-800 p-6 rounded-3xl shadow-xl transition-all border-l-4 border-l-blue-600";
                 div.innerHTML = `
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] bg-blue-900/40 text-blue-400 px-2 py-1 rounded font-bold uppercase tracking-wider">
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-[10px] bg-gray-800 text-blue-400 px-2.5 py-1 rounded-lg font-black uppercase tracking-widest">
                             ${new Date(ep.timestamp).toLocaleDateString('da-DK', {day:'2-digit', month:'short', year:'numeric'})}
                         </span>
+                        <span class="text-[9px] text-gray-600 font-mono">${ep.id.split('_').pop()}</span>
                     </div>
-                    <h2 class="text-lg font-bold leading-tight mb-4 text-white">${ep.title}</h2>
+                    <h2 class="text-xl font-extrabold leading-tight mb-3 text-white tracking-tight">${ep.title}</h2>
+                    <p class="text-sm text-gray-400 mb-6 font-light leading-relaxed line-clamp-3">
+                        ${ep.description || 'Ingen beskrivelse tilgængelig for dette afsnit.'}
+                    </p>
                     <button onclick="copyAndOpen('${ep.id}')" 
-                       class="block w-full text-center bg-blue-600 active:bg-blue-800 text-white py-3 rounded-xl font-bold uppercase text-sm shadow-lg shadow-blue-900/30">
-                       Kopiér ID & Åbn Arkiv
+                       class="block w-full text-center bg-blue-600 hover:bg-blue-500 active:scale-95 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all shadow-lg shadow-blue-900/40">
+                       Kopiér ID & Åbn KB.dk
                     </button>
                 `;
                 container.appendChild(div);
@@ -70,7 +74,7 @@
 
         function copyAndOpen(id) {
             navigator.clipboard.writeText(id).then(() => {
-                alert("ID KOPIERET!\n\nSæt det ind i søgefeltet på KB.dk for at lytte.");
+                alert("ID KOPIERET!\n\nID: " + id + "\n\nSæt det nu ind i søgefeltet på KB.dk.");
                 window.open("https://www.kb.dk/find-materiale/dr-arkivet/find?q=sigrid+riise&sort=startTime%20asc", "_blank");
             });
         }
@@ -79,6 +83,7 @@
             const query = document.getElementById('search').value.toLowerCase();
             const filtered = allEpisodes.filter(ep => 
                 ep.title.toLowerCase().includes(query) || 
+                (ep.description && ep.description.toLowerCase().includes(query)) ||
                 ep.timestamp.toLowerCase().includes(query)
             );
             renderEpisodes(filtered);
