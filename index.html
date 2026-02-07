@@ -3,45 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Sigrid Riise Arkiv</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; -webkit-tap-highlight-color: transparent; }
+        .episode-card:active { transform: scale(0.98); background-color: #111; }
+        .sticky-header { background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(10px); }
+    </style>
 </head>
-<body class="bg-black text-gray-100 font-sans">
+<body class="text-gray-100 font-sans">
 
-    <nav class="sticky top-0 bg-gray-900/95 p-4 border-b border-gray-800 z-50">
-        <h1 class="text-xl font-bold text-blue-500 uppercase tracking-tighter italic">Sigrid Riise <span class="text-white not-italic font-light text-sm">Arkiv</span></h1>
+    <nav class="sticky-header sticky top-0 p-4 border-b border-gray-800 z-50 shadow-2xl">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-xl font-bold text-blue-500 uppercase tracking-tighter italic">Sigrid Riise <span class="text-white not-italic font-light text-sm">Arkiv</span></h1>
+            <span id="count" class="text-[10px] bg-gray-800 px-2 py-1 rounded text-gray-400 font-mono">0 afsnit</span>
+        </div>
+        <input type="text" id="search" onkeyup="filterEpisodes()" placeholder="Søg år (f.eks. 1995) eller emne..." 
+               class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-600 outline-none transition-all">
     </nav>
 
-    <main id="app" class="p-4 space-y-4">
-        </main>
+    <main id="app" class="p-4 space-y-4 pb-20">
+        <div class="text-center py-20 text-gray-500 animate-pulse">Indlæser database...</div>
+    </main>
 
     <script>
+        let allEpisodes = [];
+
         async function loadApp() {
-            const res = await fetch('data.json?v=' + Date.now());
-            const episodes = await res.json();
+            try {
+                const res = await fetch('data.json?v=' + Date.now());
+                const data = await res.json();
+                
+                // Mekanisme: Sorterer kronologisk baglæns (nyeste først)
+                allEpisodes = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                document.getElementById('count').innerText = `${allEpisodes.length} afsnit`;
+                renderEpisodes(allEpisodes);
+            } catch (error) {
+                document.getElementById('app').innerHTML = `<div class="p-10 text-red-500 text-center text-sm">Kunne ikke indlæse data.json.</div>`;
+            }
+        }
+
+        function renderEpisodes(episodes) {
             const container = document.getElementById('app');
             container.innerHTML = ''; 
 
             episodes.forEach(ep => {
-                // MEKANISME: Vi opretter et link, der søger specifikt på Sigrid Riise 
-                // i det præcise tidsrum for udsendelsen.
-                // Vi tilføjer 'sort=startTime asc' for at sikre kronologien.
-                const searchLink = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=sigrid+riise&filter=startTime%3A%5B${ep.timestamp}+TO+${ep.timestamp}%5D&sort=startTime%20asc`;
-                
                 const div = document.createElement('div');
-                div.className = "bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl active:bg-gray-800 transition-colors";
+                div.className = "bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl transition-all";
                 div.innerHTML = `
-                    <div class="text-[10px] text-blue-400 font-mono font-bold mb-1">${new Date(ep.timestamp).toLocaleDateString('da-DK')}</div>
-                    <h2 class="text-lg font-bold leading-tight mb-2">${ep.title}</h2>
-                    <p class="text-sm text-gray-400 mb-5 font-light">${ep.description}</p>
-                    <a href="${searchLink}" target="_blank" 
-                       class="block w-full text-center bg-blue-600 text-white py-3.5 rounded-xl font-bold uppercase tracking-wider text-sm shadow-lg shadow-blue-900/40">
-                       Find i DR Arkivet
-                    </a>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] bg-blue-900/40 text-blue-400 px-2 py-1 rounded font-bold uppercase tracking-wider">
+                            ${new Date(ep.timestamp).toLocaleDateString('da-DK', {day:'2-digit', month:'short', year:'numeric'})}
+                        </span>
+                    </div>
+                    <h2 class="text-lg font-bold leading-tight mb-4 text-white">${ep.title}</h2>
+                    <button onclick="copyAndOpen('${ep.id}')" 
+                       class="block w-full text-center bg-blue-600 active:bg-blue-800 text-white py-3 rounded-xl font-bold uppercase text-sm shadow-lg shadow-blue-900/30">
+                       Kopiér ID & Åbn Arkiv
+                    </button>
                 `;
                 container.appendChild(div);
             });
         }
+
+        function copyAndOpen(id) {
+            navigator.clipboard.writeText(id).then(() => {
+                alert("ID KOPIERET!\n\nSæt det ind i søgefeltet på KB.dk for at lytte.");
+                window.open("https://www.kb.dk/find-materiale/dr-arkivet/find?q=sigrid+riise&sort=startTime%20asc", "_blank");
+            });
+        }
+
+        function filterEpisodes() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const filtered = allEpisodes.filter(ep => 
+                ep.title.toLowerCase().includes(query) || 
+                ep.timestamp.toLowerCase().includes(query)
+            );
+            renderEpisodes(filtered);
+        }
+
         loadApp();
     </script>
 </body>
