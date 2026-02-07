@@ -18,7 +18,7 @@
     </nav>
 
     <main id="app" class="p-4 space-y-4 pb-12">
-        <div class="text-center py-10 text-gray-500 italic">Indlæser arkiv...</div>
+        <div class="text-center py-10 text-gray-500 italic">Forbereder arkiv...</div>
     </main>
 
     <script>
@@ -30,9 +30,10 @@
                 container.innerHTML = ''; 
 
                 episodes.forEach(ep => {
-                    // MEKANISME: Vi bruger 'find?q=' i stedet for '/post/'. 
-                    // Dette tvinger KB til at validere din session og vise afspilleren korrekt.
-                    const secureLink = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=${ep.id}`;
+                    // MEKANISME: Vi søger på den fulde titel i gåseøjne. 
+                    // Dette omgår ID-fejl og session-blokeringer.
+                    const searchQuery = encodeURIComponent(`"${ep.title}"`);
+                    const secureLink = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=${searchQuery}`;
                     
                     const div = document.createElement('div');
                     div.className = "episode-card bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl transition-all";
@@ -46,13 +47,13 @@
                         <p class="text-sm text-gray-400 line-clamp-2 mb-5 font-light leading-relaxed">${ep.description}</p>
                         <a href="${secureLink}" target="_blank" 
                            class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-900/20 uppercase tracking-wide">
-                           Åbn afspiller
+                           FIND I ARKIVET
                         </a>
                     `;
                     container.appendChild(div);
                 });
             } catch (error) {
-                document.getElementById('app').innerHTML = `<div class="p-6 text-red-500 text-center">Data kunne ikke hentes.</div>`;
+                document.getElementById('app').innerHTML = `<div class="p-6 text-red-500 text-center">Fejl ved indlæsning.</div>`;
             }
         }
 
