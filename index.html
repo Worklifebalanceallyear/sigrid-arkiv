@@ -30,7 +30,7 @@
                     card.className = "bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-lg";
                     
                     // Mekanisme: Vi bruger ?q=ID formatet som virker hos KB
-                    const secureLink = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=${ep.id}`;
+                    const secureLink = https://www.kb.dk/find-materiale/dr-arkivet/post/${ep.id};
 
                     card.innerHTML = `
                         <div class="text-blue-500 text-xs mb-1">${ep.timestamp ? new Date(ep.timestamp).toLocaleDateString('da-DK') : ''}</div>
