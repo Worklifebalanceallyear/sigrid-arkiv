@@ -6,13 +6,14 @@
     <title>Sigrid Riise Arkiv</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-gray-100">
+<body class="bg-black text-gray-100 font-sans">
 
-    <nav class="sticky top-0 bg-gray-900 p-4 border-b border-gray-800 z-50">
-        <h1 class="text-xl font-bold text-blue-500 uppercase italic text-center">Sigrid Riise Arkiv</h1>
+    <nav class="sticky top-0 bg-gray-900/95 p-4 border-b border-gray-800 z-50">
+        <h1 class="text-xl font-bold text-blue-500 uppercase tracking-tighter italic">Sigrid Riise <span class="text-white not-italic font-light text-sm">Arkiv</span></h1>
     </nav>
 
-    <main id="app" class="p-4 space-y-4 pb-10"></main>
+    <main id="app" class="p-4 space-y-4">
+        </main>
 
     <script>
         async function loadApp() {
@@ -22,20 +23,20 @@
             container.innerHTML = ''; 
 
             episodes.forEach(ep => {
-                // MEKANISME: Vi tager datoen fra JSON (f.eks. 1994-01-04)
-                // og laver en søgning der er 100% sikker på at give hit hos KB.
-                const datoStr = ep.timestamp.split('T')[0];
-                const searchLink = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=sigrid+riise+${datoStr}`;
+                // MEKANISME: Vi opretter et link, der søger specifikt på Sigrid Riise 
+                // i det præcise tidsrum for udsendelsen.
+                // Vi tilføjer 'sort=startTime asc' for at sikre kronologien.
+                const searchLink = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=sigrid+riise&filter=startTime%3A%5B${ep.timestamp}+TO+${ep.timestamp}%5D&sort=startTime%20asc`;
                 
                 const div = document.createElement('div');
-                div.className = "bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl";
+                div.className = "bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl active:bg-gray-800 transition-colors";
                 div.innerHTML = `
-                    <div class="text-[10px] text-blue-400 font-mono mb-1">${datoStr}</div>
-                    <h2 class="text-lg font-bold mb-2">${ep.title}</h2>
-                    <p class="text-sm text-gray-400 mb-5">${ep.description}</p>
+                    <div class="text-[10px] text-blue-400 font-mono font-bold mb-1">${new Date(ep.timestamp).toLocaleDateString('da-DK')}</div>
+                    <h2 class="text-lg font-bold leading-tight mb-2">${ep.title}</h2>
+                    <p class="text-sm text-gray-400 mb-5 font-light">${ep.description}</p>
                     <a href="${searchLink}" target="_blank" 
-                       class="block w-full text-center bg-blue-600 text-white py-3.5 rounded-xl font-bold">
-                       FIND AFSNIT HOS KB
+                       class="block w-full text-center bg-blue-600 text-white py-3.5 rounded-xl font-bold uppercase tracking-wider text-sm shadow-lg shadow-blue-900/40">
+                       Find i DR Arkivet
                     </a>
                 `;
                 container.appendChild(div);
