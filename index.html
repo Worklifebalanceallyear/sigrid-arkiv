@@ -3,60 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Sigrid Riise Arkiv</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #000; -webkit-tap-highlight-color: transparent; }
-        .episode-card:active { transform: scale(0.98); background-color: #111; }
-    </style>
 </head>
-<body class="text-gray-100 font-sans">
+<body class="bg-black text-gray-100 font-sans">
 
-    <nav class="sticky top-0 bg-gray-900/95 backdrop-blur-md p-4 border-b border-gray-800 z-50">
-        <h1 class="text-xl font-bold tracking-tight text-blue-500 uppercase italic">Sigrid Riise <span class="text-white font-light not-italic text-sm ml-1">Streaming</span></h1>
+    <nav class="sticky top-0 bg-gray-900 p-4 border-b border-gray-800">
+        <h1 class="text-xl font-bold text-blue-500">SIGRID RIISE ARKIV</h1>
     </nav>
 
-    <main id="app" class="p-4 space-y-4 pb-12">
-        <div class="text-center py-10 text-gray-500 italic">Forbereder arkiv...</div>
-    </main>
+    <main id="app" class="p-4 space-y-4"></main>
 
     <script>
         async function loadApp() {
-            try {
-                const res = await fetch('data.json?v=' + Date.now());
-                const episodes = await res.json();
-                const container = document.getElementById('app');
-                container.innerHTML = ''; 
+            const res = await fetch('data.json?v=' + Date.now());
+            const episodes = await res.json();
+            const container = document.getElementById('app');
+            container.innerHTML = ''; 
 
-                episodes.forEach(ep => {
-                    // MEKANISME: Vi søger på den fulde titel i gåseøjne. 
-                    // Dette omgår ID-fejl og session-blokeringer.
-                    const searchQuery = encodeURIComponent(`"${ep.title}"`);
-                    const secureLink = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=${searchQuery}`;
-                    
-                    const div = document.createElement('div');
-                    div.className = "episode-card bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl transition-all";
-                    div.innerHTML = `
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-[10px] bg-blue-600/20 text-blue-400 px-2 py-1 rounded font-bold uppercase tracking-wider">
-                                ${ep.timestamp ? new Date(ep.timestamp).toLocaleDateString('da-DK', {day:'2-digit', month:'short', year:'numeric'}) : 'ARKIV'}
-                            </span>
-                        </div>
-                        <h2 class="text-lg font-bold leading-tight mb-2 text-white">${ep.title}</h2>
-                        <p class="text-sm text-gray-400 line-clamp-2 mb-5 font-light leading-relaxed">${ep.description}</p>
-                        <a href="${secureLink}" target="_blank" 
-                           class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-900/20 uppercase tracking-wide">
-                           FIND I ARKIVET
-                        </a>
-                    `;
-                    container.appendChild(div);
-                });
-            } catch (error) {
-                document.getElementById('app').innerHTML = `<div class="p-6 text-red-500 text-center">Fejl ved indlæsning.</div>`;
-            }
+            episodes.forEach(ep => {
+                // MEKANISME: Vi linker til en søgning på det specifikke ID,
+                // men vi tilføjer de parametre, som KB's system forventer (sort & start)
+                const kbUrl = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=${encodeURIComponent(ep.id)}&sort=startTime%20asc`;
+                
+                const div = document.createElement('div');
+                div.className = "bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl";
+                div.innerHTML = `
+                    <h2 class="text-lg font-bold mb-2">${ep.title}</h2>
+                    <p class="text-sm text-gray-400 mb-4">${ep.description}</p>
+                    <a href="${kbUrl}" target="_blank" 
+                       class="block w-full text-center bg-blue-600 text-white py-3 rounded-xl font-bold uppercase tracking-wide">
+                       Åbn i Arkivet
+                    </a>
+                `;
+                container.appendChild(div);
+            });
         }
-
         loadApp();
     </script>
 </body>
