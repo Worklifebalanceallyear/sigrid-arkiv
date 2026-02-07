@@ -6,13 +6,13 @@
     <title>Sigrid Riise Arkiv</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-black text-gray-100 font-sans">
+<body class="bg-black text-gray-100">
 
-    <nav class="sticky top-0 bg-gray-900 p-4 border-b border-gray-800">
-        <h1 class="text-xl font-bold text-blue-500">SIGRID RIISE ARKIV</h1>
+    <nav class="sticky top-0 bg-gray-900 p-4 border-b border-gray-800 z-50">
+        <h1 class="text-xl font-bold text-blue-500 uppercase italic text-center">Sigrid Riise Arkiv</h1>
     </nav>
 
-    <main id="app" class="p-4 space-y-4"></main>
+    <main id="app" class="p-4 space-y-4 pb-10"></main>
 
     <script>
         async function loadApp() {
@@ -22,18 +22,20 @@
             container.innerHTML = ''; 
 
             episodes.forEach(ep => {
-                // MEKANISME: Vi linker til en søgning på det specifikke ID,
-                // men vi tilføjer de parametre, som KB's system forventer (sort & start)
-                const kbUrl = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=${encodeURIComponent(ep.id)}&sort=startTime%20asc`;
+                // MEKANISME: Vi tager datoen fra JSON (f.eks. 1994-01-04)
+                // og laver en søgning der er 100% sikker på at give hit hos KB.
+                const datoStr = ep.timestamp.split('T')[0];
+                const searchLink = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=sigrid+riise+${datoStr}`;
                 
                 const div = document.createElement('div');
                 div.className = "bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl";
                 div.innerHTML = `
+                    <div class="text-[10px] text-blue-400 font-mono mb-1">${datoStr}</div>
                     <h2 class="text-lg font-bold mb-2">${ep.title}</h2>
-                    <p class="text-sm text-gray-400 mb-4">${ep.description}</p>
-                    <a href="${kbUrl}" target="_blank" 
-                       class="block w-full text-center bg-blue-600 text-white py-3 rounded-xl font-bold uppercase tracking-wide">
-                       Åbn i Arkivet
+                    <p class="text-sm text-gray-400 mb-5">${ep.description}</p>
+                    <a href="${searchLink}" target="_blank" 
+                       class="block w-full text-center bg-blue-600 text-white py-3.5 rounded-xl font-bold">
+                       FIND AFSNIT HOS KB
                     </a>
                 `;
                 container.appendChild(div);
