@@ -11,52 +11,51 @@
         .episode-card:active { transform: scale(0.98); background-color: #111; }
     </style>
 </head>
-<body class="text-gray-100 font-sans">
+<body class="text-gray-100 font-sans text-base">
 
     <nav class="sticky top-0 bg-gray-900/95 backdrop-blur-md p-4 border-b border-gray-800 z-50">
-        <h1 class="text-xl font-bold tracking-tight text-blue-500">SIGRID RIISE <span class="text-white font-light text-sm ml-2">ARKIV</span></h1>
+        <h1 class="text-xl font-bold tracking-tight text-blue-500 uppercase italic">Sigrid Riise <span class="text-white font-light not-italic text-sm ml-1">Streaming</span></h1>
     </nav>
 
-    <main id="app" class="p-4 space-y-4 pb-10">
-        <div class="text-center py-10 text-gray-500">Indlæser afsnit...</div>
-    </main>
+    <main id="app" class="p-4 space-y-4 pb-12">
+        </main>
 
     <script>
         async function loadApp() {
             try {
-                // Hent data med cache-busting
+                // Hent data med tidsstempel for at undgå gammel cache
                 const res = await fetch('data.json?v=' + Date.now());
                 const episodes = await res.json();
                 const container = document.getElementById('app');
                 container.innerHTML = ''; 
 
                 episodes.forEach(ep => {
-                    // MEKANISME: Vi forsøger at ramme den direkte 'post' URL.
-                    // Hvis KB kræver præfiks, tilføjes det her.
-                    const kbId = ep.id.startsWith('online_radio_arkiv_') ? ep.id : `online_radio_arkiv_${ep.id}`;
-                    const secureLink = `https://www.kb.dk/find-materiale/dr-arkivet/post/${kbId}`;
+                    // MEKANISME: Vi bruger det rå ID direkte fra data.json uden præfiks.
+                    // Dette matcher KB's direkte post-struktur.
+                    const secureLink = `https://www.kb.dk/find-materiale/dr-arkivet/post/${ep.id}`;
                     
                     const div = document.createElement('div');
                     div.className = "episode-card bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl transition-all";
                     div.innerHTML = `
-                        <div class="mb-2">
-                            <span class="text-[10px] bg-blue-900/40 text-blue-400 px-2 py-1 rounded font-mono uppercase">
-                                ${ep.timestamp ? new Date(ep.timestamp).toLocaleDateString('da-DK') : 'Arkiv'}
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] bg-blue-600/20 text-blue-400 px-2 py-1 rounded font-bold uppercase tracking-wider">
+                                ${ep.timestamp ? new Date(ep.timestamp).toLocaleDateString('da-DK', {day:'2-digit', month:'short', year:'numeric'}) : 'ARKIV'}
                             </span>
                         </div>
-                        <h2 class="text-lg font-bold leading-tight mb-2">${ep.title}</h2>
-                        <p class="text-sm text-gray-400 line-clamp-2 mb-4 font-light">${ep.description}</p>
+                        <h2 class="text-lg font-bold leading-tight mb-2 text-white">${ep.title}</h2>
+                        <p class="text-sm text-gray-400 line-clamp-2 mb-5 font-light leading-relaxed">${ep.description}</p>
                         <a href="${secureLink}" target="_blank" 
-                           class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold text-sm">
-                           START AFSPILNING
+                           class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-900/20 uppercase tracking-wide">
+                           Afspil i DR Arkivet
                         </a>
                     `;
                     container.appendChild(div);
                 });
             } catch (error) {
                 document.getElementById('app').innerHTML = `
-                    <div class="p-4 bg-red-900/20 text-red-400 rounded-lg border border-red-800 text-sm">
-                        Fejl: Kunne ikke indlæse data.json. Tjek filen for komma-fejl.
+                    <div class="p-6 bg-red-900/10 border border-red-800 rounded-2xl text-red-500 text-center">
+                        <p class="font-bold">Datafejl</p>
+                        <p class="text-xs mt-1 text-red-400/80">Tjek venligst om data.json er formateret korrekt.</p>
                     </div>`;
             }
         }
