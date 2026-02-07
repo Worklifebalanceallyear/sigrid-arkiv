@@ -1,8 +1,82 @@
 [
   {
-    "title": "Sigrid Riise - Afsnit 1",
-    "timestamp": "1975-05-10T10:00:00Z",
-    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/arkiv-id-her",
-    "description": "Beskrivelse af udsendelsen."
+    "id": "doms_radio_radioportal-p03_1994-08-16_090300_001",
+    "title": "Sigrid Riise: Opdragelse og samvær (1994)",
+    "timestamp": "1994-08-16T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-08-16_090300_001",
+    "description": "Sigrid Riise i samtale om hverdagens små og store udfordringer i børnefamilien. Fokus på autoritet og kærlighed."
+  },
+  {
+    "id": "doms_radio_radioportal-p03_1994-08-23_090300_001",
+    "title": "Sigrid Riise: Søskende og jalousi",
+    "timestamp": "1994-08-23T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-08-23_090300_001",
+    "description": "Hvordan håndterer man konflikter mellem søskende? Sigrid giver konkrete råd til forældre."
+  },
+  {
+    "id": "doms_radio_radioportal-p03_1994-08-30_090300_001",
+    "title": "Sigrid Riise: Skolestart og forventninger",
+    "timestamp": "1994-08-30T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-08-30_090300_001",
+    "description": "En gennemgang af barnets overgang fra børnehave til skolemiljøet."
+  },
+  {
+    "id": "doms_radio_radioportal-p03_1994-09-06_090300_001",
+    "title": "Sigrid Riise: Grænser i hjemmet",
+    "timestamp": "1994-09-06T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-09-06_090300_001",
+    "description": "Om betydningen af faste rammer og hvordan man siger nej uden at miste kontakten."
+  },
+  {
+    "id": "doms_radio_radioportal-p03_1994-09-13_090300_001",
+    "title": "Sigrid Riise: Barnets selvværd",
+    "timestamp": "1994-09-13T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-09-13_090300_001",
+    "description": "Hvordan støtter vi barnets tro på egne evner? En dybdegående analyse af anerkendelse."
+  },
+  {
+    "id": "doms_radio_radioportal-p03_1994-09-20_090300_001",
+    "title": "Sigrid Riise: Leg og fantasi",
+    "timestamp": "1994-09-20T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-09-20_090300_001",
+    "description": "Legens betydning for barnets kognitive udvikling og trivsel."
+  },
+  {
+    "id": "doms_radio_radioportal-p03_1994-09-27_090300_001",
+    "title": "Sigrid Riise: Kost og vaner",
+    "timestamp": "1994-09-27T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-09-27_090300_001",
+    "description": "Konflikter omkring spisebordet og hvordan man skaber sunde madvaner tidligt."
+  },
+  {
+    "id": "doms_radio_radioportal-p03_1994-10-04_090300_001",
+    "title": "Sigrid Riise: Søvn og rutiner",
+    "timestamp": "1994-10-04T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-10-04_090300_001",
+    "description": "Gode råd til puttesituationen og barnets behov for hvile."
+  },
+  {
+    "id": "doms_radio_radioportal-p03_1994-10-11_090300_001",
+    "title": "Sigrid Riise: Institutionslivet",
+    "timestamp": "1994-10-11T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-10-11_090300_001",
+    "description": "Samarbejdet mellem hjem og institution. Hvordan sikrer vi barnets røde tråd?"
+  },
+  {
+    "id": "doms_radio_radioportal-p03_1994-10-18_090300_001",
+    "title": "Sigrid Riise: Teenage-år i vente",
+    "timestamp": "1994-10-18T09:03:00Z",
+    "duration": 1500,
+    "link": "https://www.kb.dk/find-materiale/dr-arkivet/post/doms_radio_radioportal-p03_1994-10-18_090300_001",
+    "description": "De tidlige tegn på løsrivelse og hvordan man bevarer den gode dialog."
   }
 ]
