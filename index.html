@@ -2,49 +2,62 @@
 <html lang="da">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Sigrid Riise Arkiv</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; -webkit-tap-highlight-color: transparent; }
+        .episode-card:active { transform: scale(0.98); background-color: #111; }
+    </style>
 </head>
-<body class="bg-black text-white font-sans">
+<body class="text-gray-100 font-sans">
 
-    <nav class="p-4 border-b border-gray-800 sticky top-0 bg-black z-10">
-        <h1 class="text-xl font-bold">Sigrid Riise Arkiv</h1>
+    <nav class="sticky top-0 bg-gray-900/95 backdrop-blur-md p-4 border-b border-gray-800 z-50">
+        <h1 class="text-xl font-bold tracking-tight text-blue-500">SIGRID RIISE <span class="text-white font-light text-sm ml-2">ARKIV</span></h1>
     </nav>
 
-    <main id="app" class="p-4 space-y-4">
-        </main>
+    <main id="app" class="p-4 space-y-4 pb-10">
+        <div class="text-center py-10 text-gray-500">Indlæser afsnit...</div>
+    </main>
 
     <script>
         async function loadApp() {
             try {
-                // Vi tilføjer tidsstempel for at undgå caching-problemer
-                const response = await fetch('data.json?t=' + Date.now());
-                const episodes = await response.json();
+                // Hent data med cache-busting
+                const res = await fetch('data.json?v=' + Date.now());
+                const episodes = await res.json();
                 const container = document.getElementById('app');
-                
-                container.innerHTML = ''; // Rydder "Indlæser" besked
+                container.innerHTML = ''; 
 
                 episodes.forEach(ep => {
-                    const card = document.createElement('div');
-                    card.className = "bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-lg";
+                    // MEKANISME: Vi forsøger at ramme den direkte 'post' URL.
+                    // Hvis KB kræver præfiks, tilføjes det her.
+                    const kbId = ep.id.startsWith('online_radio_arkiv_') ? ep.id : `online_radio_arkiv_${ep.id}`;
+                    const secureLink = `https://www.kb.dk/find-materiale/dr-arkivet/post/${kbId}`;
                     
-                    // Mekanisme: Vi bruger ?q=ID formatet som virker hos KB
-                    const secureLink = https://www.kb.dk/find-materiale/dr-arkivet/post/${ep.id};
-
-                    card.innerHTML = `
-                        <div class="text-blue-500 text-xs mb-1">${ep.timestamp ? new Date(ep.timestamp).toLocaleDateString('da-DK') : ''}</div>
-                        <h2 class="text-lg font-bold mb-2">${ep.title}</h2>
-                        <p class="text-gray-400 text-sm mb-4">${ep.description}</p>
+                    const div = document.createElement('div');
+                    div.className = "episode-card bg-gray-900 border border-gray-800 p-5 rounded-2xl shadow-xl transition-all";
+                    div.innerHTML = `
+                        <div class="mb-2">
+                            <span class="text-[10px] bg-blue-900/40 text-blue-400 px-2 py-1 rounded font-mono uppercase">
+                                ${ep.timestamp ? new Date(ep.timestamp).toLocaleDateString('da-DK') : 'Arkiv'}
+                            </span>
+                        </div>
+                        <h2 class="text-lg font-bold leading-tight mb-2">${ep.title}</h2>
+                        <p class="text-sm text-gray-400 line-clamp-2 mb-4 font-light">${ep.description}</p>
                         <a href="${secureLink}" target="_blank" 
-                           class="inline-block w-full text-center bg-blue-600 text-white font-bold py-3 rounded-lg">
-                           AFSPIL NU
+                           class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold text-sm">
+                           START AFSPILNING
                         </a>
                     `;
-                    container.appendChild(card);
+                    container.appendChild(div);
                 });
-            } catch (e) {
-                document.getElementById('app').innerHTML = "Fejl ved indlæsning af data. Tjek data.json.";
+            } catch (error) {
+                document.getElementById('app').innerHTML = `
+                    <div class="p-4 bg-red-900/20 text-red-400 rounded-lg border border-red-800 text-sm">
+                        Fejl: Kunne ikke indlæse data.json. Tjek filen for komma-fejl.
+                    </div>`;
             }
         }
 
