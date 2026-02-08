@@ -6,100 +6,72 @@
     <title>Sigrid Riise Arkiv</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0d1117; -webkit-tap-highlight-color: transparent; }
-        .glass-nav { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid #30363d; }
-        .card { background-color: #161b22; border: 1px solid #30363d; transition: transform 0.2s; }
-        .card:active { transform: scale(0.98); }
+        body { background-color: #05070a; color: #f0f0f0; -webkit-font-smoothing: antialiased; }
+        .glass-header { background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #30363d; }
+        .episode-card { background: #161b22; border: 1px solid #30363d; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .episode-card:active { transform: scale(0.98); background: #1c2128; }
+        .btn-blue { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
     </style>
 </head>
-<body class="text-gray-200 font-sans">
+<body>
 
-    <nav class="glass-nav sticky top-0 p-4 z-50 shadow-xl">
-        <div class="max-w-2xl mx-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-xl font-black text-white tracking-tight italic">SR <span class="text-blue-500 not-italic">ARKIV</span></h1>
-                <div id="count" class="text-[10px] font-mono bg-blue-500/10 text-blue-400 px-2 py-1 rounded-full border border-blue-500/20">000 AFSNIT</div>
+    <header class="glass-header sticky top-0 z-50 p-6">
+        <div class="max-w-xl mx-auto flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-black italic tracking-tighter uppercase">SR <span class="text-blue-500">Arkiv</span></h1>
+                <div id="counter" class="text-[10px] font-mono font-bold bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20 uppercase tracking-widest text-center">Indlæser...</div>
             </div>
-            <input type="text" id="search" onkeyup="filterEpisodes()" placeholder="Søg i emner eller år..." 
-                   class="w-full p-4 bg-[#0d1117] rounded-2xl border border-[#30363d] text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all shadow-inner">
+            <input type="text" id="search" oninput="runSearch()" placeholder="Søg i 500+ afsnit (år eller emne)..." 
+                   class="w-full bg-[#0d1117] border border-[#30363d] rounded-2xl p-4 text-white focus:ring-2 focus:ring-blue-600 outline-none transition-all shadow-inner">
         </div>
-    </nav>
+    </header>
 
-    <main id="app" class="max-w-2xl mx-auto p-4 space-y-4 pb-24">
-        <div class="text-center py-20 text-gray-500">Indlæser historisk database...</div>
-    </main>
+    <main id="app" class="max-w-xl mx-auto p-4 space-y-4 pb-32">
+        </main>
 
     <script>
-        let allEpisodes = [];
+        let db = [];
 
-        async function loadApp() {
+        async function init() {
             try {
-                const res = await fetch('data.json?v=' + Date.now());
-                const data = await res.json();
-                
-                // Mekanisme: Kronologisk sortering (nyeste øverst)
-                allEpisodes = data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                document.getElementById('count').innerText = `${allEpisodes.length} AFSNIT`;
-                renderEpisodes(allEpisodes);
-            } catch (error) {
-                document.getElementById('app').innerHTML = `<div class="p-10 text-center text-red-400">Kunne ikke hente data.json</div>`;
+                const r = await fetch('data.json?v=' + Date.now());
+                db = (await r.json()).reverse();
+                document.getElementById('counter').innerText = db.length + " AFSNIT";
+                render(db);
+            } catch (e) {
+                document.getElementById('app').innerHTML = "Kunne ikke indlæse data.json";
             }
         }
 
-        function renderEpisodes(episodes) {
-            const container = document.getElementById('app');
-            container.innerHTML = ''; 
+        function render(list) {
+            const app = document.getElementById('app');
+            app.innerHTML = list.map(item => {
+                const day = item.timestamp;
+                // MEKANISME: Den absolutte filter-URL
+                const filterRaw = `startTime:[${day}T00:00:00Z TO ${day}T23:59:59Z]`;
+                const finalUrl = `https://www.kb.dk/find-materiale/dr-arkivet/find?q=sigrid+riise&filter=${encodeURIComponent(filterRaw)}`;
 
-            episodes.forEach(ep => {
-                const dateObj = new Date(ep.timestamp);
-                const dateStr = dateObj.toLocaleDateString('da-DK', {day:'2-digit', month:'short', year:'numeric'});
-                
-                // Mekanisme: Vi prøver med det direkte link igen, 
-                // da det er den mest elegante brugeroplevelse hvis KB er oppe.
-                const directLink = `https://www.kb.dk/find-materiale/dr-arkivet/post/${ep.id}`;
-
-                const div = document.createElement('div');
-                div.className = "card p-6 rounded-3xl shadow-sm";
-                div.innerHTML = `
-                    <div class="flex items-center space-x-2 mb-3">
-                        <span class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">${dateStr}</span>
+                return `
+                <div class="episode-card p-6 rounded-[2rem] shadow-xl">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-[11px] font-black text-blue-500 tracking-[0.2em] uppercase italic">${day}</span>
                     </div>
-                    <h2 class="text-lg font-bold text-white mb-2 leading-tight">${ep.title}</h2>
-                    <p class="text-sm text-gray-400 mb-6 font-light leading-relaxed">${ep.description || ''}</p>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <a href="${directLink}" target="_blank" 
-                           class="flex items-center justify-center bg-blue-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-tighter">
-                           Afspil nu
-                        </a>
-                        <button onclick="copyID('${ep.id}')" 
-                           class="flex items-center justify-center bg-gray-800 text-gray-300 py-3 rounded-xl font-bold text-xs uppercase tracking-tighter border border-gray-700">
-                           Kopiér ID
-                        </button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
+                    <h2 class="text-xl font-bold text-white mb-2 tracking-tight">${item.title}</h2>
+                    <p class="text-sm text-gray-400 mb-6 font-light leading-relaxed">${item.description}</p>
+                    <a href="${finalUrl}" target="_blank" 
+                       class="btn-blue block w-full text-center py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-white shadow-lg">
+                       Find hos KB
+                    </a>
+                </div>
+            `}).join('');
         }
 
-        function copyID(id) {
-            navigator.clipboard.writeText(id).then(() => {
-                alert("ID kopieret til udklipsholderen!");
-            });
+        function runSearch() {
+            const q = document.getElementById('search').value.toLowerCase();
+            render(db.filter(i => i.timestamp.includes(q) || i.description.toLowerCase().includes(q) || i.title.toLowerCase().includes(q)));
         }
 
-        function filterEpisodes() {
-            const query = document.getElementById('search').value.toLowerCase();
-            const filtered = allEpisodes.filter(ep => 
-                ep.title.toLowerCase().includes(query) || 
-                (ep.description && ep.description.toLowerCase().includes(query)) ||
-                ep.timestamp.includes(query)
-            );
-            renderEpisodes(filtered);
-        }
-
-        loadApp();
+        init();
     </script>
 </body>
 </html>
